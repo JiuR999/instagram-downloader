@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { useTheme } from "@/app/components/theme-provider";
 import { toCorsUrl } from "@/lib/utils";
 
-type ResourceType = 'image' | 'video';
+type ResourceType = 'image' | 'Video';
 type ResourceInfo = {
   filename: string;
   width: number;
@@ -89,14 +89,29 @@ export default function Home() {
           <div className="space-y-4">
             <label className="block text-sm font-medium mb-1">Instagram Link</label>
             <div className="relative">
-              <input
-                type="text"
-                value={url}
-                onChange={(e) => setUrl(e.target.value)}
-                placeholder="Paste link here (e.g. https://www.instagram.com/p/...)"
-                className="w-full px-4 py-3 rounded-lg border border-input bg-input focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
-                onKeyDown={(e) => e.key === 'Enter' && handleAnalyze()}
-              />
+              <div className="relative">
+                <input
+                  type="text"
+                  value={url}
+                  onChange={(e) => setUrl(e.target.value)}
+                  placeholder="Paste link here (e.g. https://www.instagram.com/p/...)"
+                  className="w-full px-4 py-3 rounded-lg border border-input bg-input focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all pr-10"
+                  onKeyDown={(e) => e.key === 'Enter' && handleAnalyze()}
+                />
+                {url && (
+                  <button
+                    type="button"
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors p-1 rounded"
+                    onClick={() => setUrl('')}
+                    tabIndex={-1}
+                    aria-label="清空"
+                  >
+                    <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+                      <path d="M6 6l8 8M14 6l-8 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                    </svg>
+                  </button>
+                )}
+              </div>
             </div>
 
             {error && (
@@ -142,12 +157,20 @@ const ResourceCard: React.FC<{ info: ResourceInfo }> = ({ info }) => {
   return (
     <div className="bg-card rounded-xl border border-border overflow-hidden shadow-sm hover:shadow-md transition-shadow group">
       <div className="aspect-[4/5] bg-gray-100 dark:bg-gray-800 relative flex items-center justify-center">
-        {info.type === 'video' ? (
+        {info.type === 'Video' ? (
+
           <video
-            src={toCorsUrl(info.url)}
+            className="w-full h-[400px] rounded-b"
             controls
-            className="w-full h-full object-cover"
-          />
+            playsInline={true}
+            preload="metadata"
+            muted
+            loop={true}
+          >
+            <source src={info.url} type="video/mp4" />
+
+          </video>
+
         ) : (
           <img
             key={info.filename}
@@ -176,7 +199,7 @@ const ResourceCard: React.FC<{ info: ResourceInfo }> = ({ info }) => {
         </div>
 
         <a
-        
+
           href={`/api/download?url=${encodeURIComponent(info.url)}&filename=${encodeURIComponent(info.filename)}`}
           download={info.filename}
           target="_blank"
